@@ -68,3 +68,19 @@ button:hover {
 .botao-admin:hover {
   background-color: #9f896f;
 }
+
+.botao-voltar {
+  display: inline-block;
+  background-color: #b29c7d;
+  color: white;
+  padding: 8px 16px;
+  margin: 10px 0;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.botao-voltar:hover {
+  background-color: #9f896f;
+}
