@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Rosário Borges</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Painel do Vendedor</h1>
+  <div id="login">
+    <input type="password" id="senha" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+  </div>
+  <div id="painel" style="display:none;">
+    <h2>Gerenciar Produtos</h2>
+    <input type="text" id="nome" placeholder="Nome do terço">
+    <input type="text" id="descricao" placeholder="Descrição">
+    <input type="number" id="preco" placeholder="Preço">
+    <input type="text" id="imagem" placeholder="URL da imagem">
+    <button onclick="adicionarProduto()">Adicionar</button>
+    <h3>Lista de Produtos</h3>
+    <div id="lista"></div>
+  </div>
+  <script src="admin.js"></script>
+</body>
+</html>
