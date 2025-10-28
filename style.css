@@ -53,3 +53,18 @@ button {
 button:hover {
   background-color: #b29c7d;
 }
+
+.botao-admin {
+  display: inline-block;
+  background-color: #b29c7d;
+  color: white;
+  padding: 8px 16px;
+  margin-top: 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.botao-admin:hover {
+  background-color: #9f896f;
+}
