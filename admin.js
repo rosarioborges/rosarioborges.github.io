@@ -53,7 +53,7 @@ function salvarProdutos(lista) {
   fetch('https://api.github.com/repos/SEU_USUARIO/RosarioBorges/contents/produtos.json', {
     method: 'PUT',
     headers: {
-      'Authorization': 'token SEU_TOKEN_GITHUB',
+      'Authorization': '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',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
