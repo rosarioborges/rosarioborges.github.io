@@ -49,16 +49,55 @@ function excluirProduto(i) {
     });
 }
 
-function salvarProdutos(lista) {
-  fetch('https://api.github.com/repos/rosarioborges/rosarioborges.github.io/contents/produtos.json', {
-    method: 'PUT',
-    headers: {
-      'Authorization': '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',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      message: 'Atualização de produtos',
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(lista, null, 2))))
-    })
-  }).then(() => alert('Produtos atualizados com sucesso!'));
+// Exemplo: função corrigida para atualizar produtos.json incluindo sha atual
+async function salvarProdutos(lista, message = 'Atualização de produtos') {
+  // gh.owner, gh.repo, gh.branch e gh.token devem estar preenchidos como no seu admin.js
+  const path = 'produtos.json';
+  const url = `https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/${path}`;
+
+  try {
+    // 1) Pegar o SHA atual (se existir)
+    const getRes = await fetch(url + `?ref=${gh.branch}`, {
+      headers: { Authorization: 'token ' + gh.token }
+    });
+
+    let sha = null;
+    if (getRes.ok) {
+      const j = await getRes.json();
+      sha = j.sha;
+    }
+    // 2) Preparar conteúdo em base64
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(lista, null, 2))));
+
+    // 3) Montar corpo do PUT (incluir sha se existir)
+    const body = {
+      message,
+      branch: gh.branch,
+      content
+    };
+    if (sha) body.sha = sha;
+
+    const putRes = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        Authorization: 'token ' + gh.token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!putRes.ok) {
+      const text = await putRes.text();
+      console.error('Erro ao salvar produtos:', putRes.status, text);
+      alert('Erro ao salvar produtos. Veja o console para detalhes.');
+      return false;
+    }
+
+    alert('Produtos atualizados com sucesso!');
+    return true;
+  } catch (err) {
+    console.error('Erro salvarProdutos:', err);
+    alert('Erro interno. Veja o console.');
+    return false;
+  }
 }
