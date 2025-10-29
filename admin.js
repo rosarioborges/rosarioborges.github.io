@@ -50,7 +50,7 @@ function excluirProduto(i) {
 }
 
 function salvarProdutos(lista) {
-  fetch('https://api.github.com/repos/rosarioborges/RosarioBorges/contents/produtos.json', {
+  fetch('https://api.github.com/repos/rosarioborges/rosarioborges.github.io/contents/produtos.json', {
     method: 'PUT',
     headers: {
       'Authorization': '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',
