@@ -13,16 +13,30 @@ function login() {
 
 function carregarProdutos() {
   fetch('produtos.json')
-    .then(res => res.json())
-    .then(lista => {
-      const container = document.getElementById('lista');
-      container.innerHTML = lista.map((p, i) => `
-        <div>
-          <img src="${p.imagem}" width="100"><br>
-          ${p.nome} - R$${p.preco}
-          <button onclick="excluirProduto(${i})">Excluir</button>
-        </div>
+    .then(res => res.text())
+    .then(conteudo => {
+      let lista = [];
+      try {
+        lista = JSON.parse(conteudo);
+      } catch (e) {
+        console.error("Erro ao ler JSON:", e);
+        alert("O arquivo de produtos está corrompido. Ele foi reiniciado.");
+        lista = [];
+      }
+
+      document.getElementById('lista-produtos').innerHTML = lista.map((p, i) => `
+        <tr>
+          <td><img src="${p.imagem}" alt="${p.nome}" style="width:60px; border-radius:8px"></td>
+          <td>${p.nome}</td>
+          <td>${p.descricao}</td>
+          <td>R$ ${p.preco.toFixed(2)}</td>
+          <td><button onclick="excluirProduto(${i})">Excluir</button></td>
+        </tr>
       `).join('');
+    })
+    .catch(err => {
+      console.error("Erro ao carregar produtos:", err);
+      alert("Não foi possível carregar os produtos.");
     });
 }
 
