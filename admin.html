@@ -3,107 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel do Vendedor - Rosário Borges</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Painel do Vendedor</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <h1>Painel do Vendedor</h1>
-  <a href="index.html" class="botao-voltar">⬅️ Voltar ao Catálogo</a>
 
-  <div id="login">
-    <input type="password" id="senha" placeholder="Senha" />
-    <button onclick="login()">Entrar</button>
-  </div>
-
-  <div id="painel" style="display: none;">
+  <div class="card">
     <h2>Gerenciar Terços</h2>
     <input type="text" id="nome" placeholder="Nome do terço" />
     <input type="text" id="descricao" placeholder="Descrição" />
-    <input type="number" id="preco" placeholder="Preço" />
-    <input type="file" id="imagem" accept="image/*">
-    <button onclick="adicionarProduto()">Adicionar</button>
-
-    <h3>Lista de Produtos</h3>
-    <div id="lista"></div>
+    <input type="number" id="preco" placeholder="Preço (ex: 25.90)" step="0.01" />
+    <input type="file" id="imagem" accept="image/*" />
+    <button onclick="adicionarTerco()">Adicionar</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // 🔑 CONFIGURAÇÃO DO SUPABASE
-    const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
+    const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co"; // substitua pelo seu
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTUxNDgsImV4cCI6MjA3NzQzMTE0OH0.utUG4vFnpgGd5OSsqw8Q-ulU34dKkh-Z59bg8mHzetw";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 🔐 Senha simples (apenas local)
-    const SENHA = "admin123";
-
-    function login() {
-      const senha = document.getElementById("senha").value;
-      if (senha === SENHA) {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("painel").style.display = "block";
-        carregarProdutos();
-      } else {
-        alert("Senha incorreta!");
-      }
-    }
-
-    // 🟢 Adicionar novo terço
-    async function adicionarProduto() {
-      const nome = document.getElementById("nome").value.trim();
-      const descricao = document.getElementById("descricao").value.trim();
-      const preco = parseFloat(document.getElementById("preco").value);
-      const imagem = document.getElementById("imagem").value.trim();
+    async function adicionarTerco() {
+      const nome = document.getElementById('nome').value.trim();
+      const descricao = document.getElementById('descricao').value.trim();
+      const preco = document.getElementById('preco').value.trim();
+      const imagem = document.getElementById('imagem').files[0];
 
       if (!nome || !descricao || !preco || !imagem) {
-        alert("Preencha todos os campos!");
+        alert("Preencha todos os campos e selecione uma imagem!");
         return;
       }
 
-      const { data, error } = await supabase
-        .from("tercos")
-        .insert([{ nome, descricao, preco, imagem_url: imagem }]);
+      try {
+        // Upload da imagem para o bucket
+        const nomeArquivo = `${Date.now()}_${imagem.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('imagem_tercos') // <--- use o nome EXATO do seu bucket aqui
+          .upload(nomeArquivo, imagem);
 
-      if (error) {
-        console.error("Erro ao adicionar:", error);
-        alert("Erro ao adicionar produto!");
-      } else {
-        alert("Produto adicionado com sucesso!");
-        carregarProdutos();
-        document.getElementById("nome").value = "";
-        document.getElementById("descricao").value = "";
-        document.getElementById("preco").value = "";
-        document.getElementById("imagem").value = "";
+        if (uploadError) throw uploadError;
+
+        // Gerar URL pública da imagem
+        const { data } = supabase.storage
+          .from('imagem_tercos')
+          .getPublicUrl(nomeArquivo);
+
+        const imagemUrl = data.publicUrl;
+
+        // Inserir dados na tabela
+        const { error: insertError } = await supabase
+          .from('tercos')
+          .insert([{ nome, descricao, preco, imagem_url: imagemUrl }]);
+
+        if (insertError) throw insertError;
+
+        alert("✅ Terço adicionado com sucesso!");
+        document.getElementById('nome').value = '';
+        document.getElementById('descricao').value = '';
+        document.getElementById('preco').value = '';
+        document.getElementById('imagem').value = '';
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao adicionar: " + err.message);
       }
-    }
-
-    // 🟡 Carregar produtos
-    async function carregarProdutos() {
-      const { data, error } = await supabase
-        .from("tercos")
-        .select("*")
-        .order("criado_em", { ascending: false });
-
-      if (error) {
-        console.error("Erro ao carregar:", error);
-        return;
-      }
-
-      const lista = document.getElementById("lista");
-      lista.innerHTML = "";
-
-      data.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `
-          <img src="${item.imagem_url}" alt="${item.nome}" width="100">
-          <h4>${item.nome}</h4>
-          <p>${item.descricao}</p>
-          <p><b>R$ ${item.preco.toFixed(2)}</b></p>
-          <hr>
-        `;
-        lista.appendChild(div);
-      });
     }
   </script>
 </body>
