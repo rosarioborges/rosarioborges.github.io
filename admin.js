@@ -64,13 +64,17 @@ function excluirProduto(i) {
     });
 }
 
-function salvarProdutos(lista) {
+async function salvarProdutos(lista) {
   fetch('https://rosarioborges-github-io-git-main-rosarioborges-projects.vercel.app/api/save-products', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ produtos: lista })
   })
   .then(res => res.json())
-  .then(() => alert('Produtos atualizados com sucesso!'))
+  .then(() => {
+    alert('Produtos atualizados com sucesso!');
+    carregarProdutos(); // atualiza a tabela
+  })
   .catch(err => alert('Erro ao salvar produtos: ' + err));
 }
+
