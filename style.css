@@ -84,3 +84,62 @@ button:hover {
 .botao-voltar:hover {
   background-color: #9f896f;
 }
+
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
+      color: #333;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+    }
+
+    input, button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    .botao-voltar {
+      display: inline-block;
+      margin-bottom: 20px;
+      text-decoration: none;
+      background: #ccc;
+      padding: 8px 12px;
+      border-radius: 5px;
+      color: #000;
+    }
+
+    #painel {
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    #lista {
+      margin-top: 20px;
+    }
+
+    .item {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #fafafa;
+      text-align: center;
+    }
+
+    .item img {
+      max-width: 100px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
