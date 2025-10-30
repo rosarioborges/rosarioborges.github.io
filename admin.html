@@ -5,46 +5,170 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Rosário Borges</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f7f7f7;
+      color: #333;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+    }
+
+    input, button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    .botao-voltar {
+      display: inline-block;
+      margin-bottom: 20px;
+      text-decoration: none;
+      background: #ccc;
+      padding: 8px 12px;
+      border-radius: 5px;
+      color: #000;
+    }
+
+    #painel {
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    #lista {
+      margin-top: 20px;
+    }
+
+    .item {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #fafafa;
+      text-align: center;
+    }
+
+    .item img {
+      max-width: 100px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+  </style>
 </head>
 <body>
+
   <h1>Painel do Vendedor</h1>
   <a href="index.html" class="botao-voltar">⬅️ Voltar ao Catálogo</a>
+
   <div id="login">
     <input type="password" id="senha" placeholder="Senha">
     <button onclick="login()">Entrar</button>
   </div>
+
   <div id="painel" style="display:none;">
-    <h2>Gerenciar Produtos</h2>
+    <h2>Gerenciar Terços</h2>
+
     <input type="text" id="nome" placeholder="Nome do terço">
     <input type="text" id="descricao" placeholder="Descrição">
     <input type="number" id="preco" placeholder="Preço">
     <input type="text" id="imagem" placeholder="URL da imagem">
     <button onclick="adicionarProduto()">Adicionar</button>
+
     <h3>Lista de Produtos</h3>
     <div id="lista"></div>
   </div>
-  <script src="admin.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://seu-projeto.supabase.co";
-    const SUPABASE_ANON_KEY = "sua-chave-publica";
-  
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  
-    // Exemplo: adicionar um terço
-    async function adicionarTerco() {
-      const { data, error } = await supabase
-        .from('tercos')
-        .insert([
-          { nome: 'Terço de madeira', preco: 25, descricao: 'Feito à mão', imagem_url: 'https://...' }
-        ]);
-  
-      if (error) console.error(error);
-      else console.log('Terço adicionado:', data);
-    }
-  
-    adicionarTerco();
-  </script>
+    // 🔐 Senha simples (pode mudar)
+    const SENHA = "admin123";
 
+    function login() {
+      const senha = document.getElementById("senha").value;
+      if (senha === SENHA) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("painel").style.display = "block";
+        listarProdutos();
+      } else {
+        alert("Senha incorreta!");
+      }
+    }
+
+    // 🔗 Configuração do Supabase
+    const { createClient } = supabase;
+    const SUPABASE_URL = "https://SEU-PROJETO.supabase.co"; // <-- troque
+    const SUPABASE_ANON_KEY = "SUA-CHAVE-PUBLICA"; // <-- troque
+
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ➕ Adicionar produto
+    async function adicionarProduto() {
+      const nome = document.getElementById("nome").value.trim();
+      const descricao = document.getElementById("descricao").value.trim();
+      const preco = parseFloat(document.getElementById("preco").value);
+      const imagem_url = document.getElementById("imagem").value.trim();
+
+      if (!nome || !descricao || !imagem_url || isNaN(preco)) {
+        alert("Preencha todos os campos!");
+        return;
+      }
+
+      const { data, error } = await db
+        .from("tercos")
+        .insert([{ nome, descricao, preco, imagem_url }]);
+
+      if (error) {
+        alert("Erro ao adicionar: " + error.message);
+      } else {
+        alert("✅ Terço adicionado com sucesso!");
+        limparCampos();
+        listarProdutos();
+      }
+    }
+
+    // 🔁 Listar produtos
+    async function listarProdutos() {
+      const { data, error } = await db
+        .from("tercos")
+        .select("*")
+        .order("criado_em", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const lista = document.getElementById("lista");
+      lista.innerHTML = "";
+
+      data.forEach(produto => {
+        lista.innerHTML += `
+          <div class="item">
+            <img src="${produto.imagem_url}" alt="${produto.nome}">
+            <h4>${produto.nome}</h4>
+            <p>${produto.descricao}</p>
+            <strong>R$ ${produto.preco}</strong>
+          </div>
+        `;
+      });
+    }
+
+    // 🧹 Limpar os campos após adicionar
+    function limparCampos() {
+      document.getElementById("nome").value = "";
+      document.getElementById("descricao").value = "";
+      document.getElementById("preco").value = "";
+      document.getElementById("imagem").value = "";
+    }
+  </script>
 </body>
 </html>
