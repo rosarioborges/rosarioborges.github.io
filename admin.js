@@ -29,7 +29,7 @@ function carregarProdutos() {
           <td><img src="${p.imagem}" alt="${p.nome}" style="width:60px; border-radius:8px"></td>
           <td>${p.nome}</td>
           <td>${p.descricao}</td>
-          <td>R$ ${p.preco.toFixed(2)}</td>
+          <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
           <td><button onclick="excluirProduto(${i})">Excluir</button></td>
         </tr>
       `).join('');
@@ -51,7 +51,8 @@ function adicionarProduto() {
     .then(lista => {
       lista.push({ nome, descricao, preco, imagem });
       salvarProdutos(lista);
-    });
+    })
+    .catch(() => salvarProdutos([{ nome, descricao, preco, imagem }]));
 }
 
 function excluirProduto(i) {
@@ -63,55 +64,13 @@ function excluirProduto(i) {
     });
 }
 
-// Exemplo: função corrigida para atualizar produtos.json incluindo sha atual
-async function salvarProdutos(lista, message = 'Atualização de produtos') {
-  // gh.owner, gh.repo, gh.branch e gh.token devem estar preenchidos como no seu admin.js
-  const path = 'produtos.json';
-  const url = `https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/${path}`;
-
-  try {
-    // 1) Pegar o SHA atual (se existir)
-    const getRes = await fetch(url + `?ref=${gh.branch}`, {
-      headers: { Authorization: 'token ' + gh.token }
-    });
-
-    let sha = null;
-    if (getRes.ok) {
-      const j = await getRes.json();
-      sha = j.sha;
-    }
-    // 2) Preparar conteúdo em base64
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(lista, null, 2))));
-
-    // 3) Montar corpo do PUT (incluir sha se existir)
-    const body = {
-      message,
-      branch: gh.branch,
-      content
-    };
-    if (sha) body.sha = sha;
-
-    const putRes = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        Authorization: 'token ' + gh.token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!putRes.ok) {
-      const text = await putRes.text();
-      console.error('Erro ao salvar produtos:', putRes.status, text);
-      alert('Erro ao salvar produtos. Veja o console para detalhes.');
-      return false;
-    }
-
-    alert('Produtos atualizados com sucesso!');
-    return true;
-  } catch (err) {
-    console.error('Erro salvarProdutos:', err);
-    alert('Erro interno. Veja o console.');
-    return false;
-  }
+function salvarProdutos(lista) {
+  fetch('https://rosarioborges-github-io-git-main-rosarioborges-projects.vercel.app/api/save-products', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ produtos: lista })
+  })
+  .then(res => res.json())
+  .then(() => alert('Produtos atualizados com sucesso!'))
+  .catch(err => alert('Erro ao salvar produtos: ' + err));
 }
