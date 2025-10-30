@@ -65,19 +65,15 @@ function excluirProduto(i) {
 }
 
 async function salvarProdutos(lista) {
-  try {
-    const response = await fetch("/api/salvarProduto", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ produtos: lista }), // ✅ CORREÇÃO AQUI
-    });
-
-    if (!response.ok) throw new Error('Falha na API');
-    
-    alert('Produtos atualizados com sucesso!');
-    carregarProdutos(); // atualiza a tabela
-  } catch (err) {
-    console.error(err);
-    alert('Erro ao salvar produtos: abu ' + err.message);
-  }
+  await fetch("/api/save-products", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ produtos: lista }),
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("Produtos atualizados com sucesso!");
+    carregarProdutos();
+  })
+  .catch(err => alert("Erro ao salvar produtos: " + err));
 }
