@@ -1,22 +1,18 @@
-export default async function handler(req, res) {
-  const { produtos } = req.body;
+import fs from "fs";
+import path from "path";
 
-  const response = await fetch(
-    "https://api.github.com/repos/rosarioborges/rosarioborges.github.io/contents/produtos.json",
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: "Atualizar produtos",
-        content: Buffer.from(JSON.stringify(produtos, null, 2)).toString("base64"),
-        sha: req.body.sha, // se quiser sobrescrever o existente
-      }),
-    }
-  );
+export default function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Método não permitido" });
+  }
 
-  const data = await response.json();
-  res.status(200).json(data);
+  try {
+    const { produtos } = req.body;
+    const filePath = path.join(process.cwd(), "public", "produtos.json");
+    fs.writeFileSync(filePath, JSON.stringify(produtos, null, 2));
+    res.status(200).json({ message: "Produtos salvos com sucesso!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao salvar produtos" });
+  }
 }
