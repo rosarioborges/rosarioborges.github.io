@@ -1,33 +1,67 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel do Vendedor</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Vendedor - Rosário Borges</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <h1>Painel do Vendedor</h1>
 
-  <div class="card">
+  <div id="login">
+    <h2>Login</h2>
+    <input type="password" id="senha" placeholder="Digite a senha">
+    <button onclick="login()">Entrar</button>
+  </div>
+
+  <div id="painel">
     <h2>Gerenciar Terços</h2>
-    <input type="text" id="nome" placeholder="Nome do terço" />
-    <input type="text" id="descricao" placeholder="Descrição" />
-    <input type="number" id="preco" placeholder="Preço (ex: 25.90)" step="0.01" />
-    <input type="file" id="imagem" accept="image/*" />
+
+    <input type="text" id="nome" placeholder="Nome do terço">
+    <input type="text" id="descricao" placeholder="Descrição">
+    <input type="number" id="preco" placeholder="Preço">
+    <input type="file" id="imagem" accept="image/*">
     <button onclick="adicionarTerco()">Adicionar</button>
+
+    <table id="tabela-tercos">
+      <thead>
+        <tr>
+          <th>Imagem</th>
+          <th>Nome</th>
+          <th>Descrição</th>
+          <th>Preço</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
   <script>
-    const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co"; // substitua pelo seu
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTUxNDgsImV4cCI6MjA3NzQzMTE0OH0.utUG4vFnpgGd5OSsqw8Q-ulU34dKkh-Z59bg8mHzetw";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SENHA = "admin123";
 
+    function login() {
+      const senha = document.getElementById("senha").value;
+      if (senha === SENHA) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("painel").style.display = "block";
+        carregarTercos();
+      } else {
+        alert("Senha incorreta!");
+      }
+    }
+
+    // ---- CONFIGURAÇÃO SUPABASE ----
+    const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ---- ADICIONAR TERÇO ----
     async function adicionarTerco() {
-      const nome = document.getElementById('nome').value.trim();
-      const descricao = document.getElementById('descricao').value.trim();
-      const preco = document.getElementById('preco').value.trim();
-      const imagem = document.getElementById('imagem').files[0];
+      const nome = document.getElementById("nome").value.trim();
+      const descricao = document.getElementById("descricao").value.trim();
+      const preco = document.getElementById("preco").value.trim();
+      const imagem = document.getElementById("imagem").files[0];
 
       if (!nome || !descricao || !preco || !imagem) {
         alert("Preencha todos os campos e selecione uma imagem!");
@@ -35,37 +69,61 @@
       }
 
       try {
-        // Upload da imagem para o bucket
+        // 1️⃣ Envia imagem para o bucket do Supabase
         const nomeArquivo = `${Date.now()}_${imagem.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from('imagem_tercos') // <--- use o nome EXATO do seu bucket aqui
+        const { error: uploadError } = await client.storage
+          .from("imagem_tercos")
           .upload(nomeArquivo, imagem);
 
         if (uploadError) throw uploadError;
 
-        // Gerar URL pública da imagem
-        const { data } = supabase.storage
-          .from('imagem_tercos')
+        // 2️⃣ Pega URL pública
+        const { data } = client.storage
+          .from("imagem_tercos")
           .getPublicUrl(nomeArquivo);
 
         const imagemUrl = data.publicUrl;
 
-        // Inserir dados na tabela
-        const { error: insertError } = await supabase
-          .from('tercos')
+        // 3️⃣ Salva no banco
+        const { error: insertError } = await client
+          .from("tercos")
           .insert([{ nome, descricao, preco, imagem_url: imagemUrl }]);
 
         if (insertError) throw insertError;
 
         alert("✅ Terço adicionado com sucesso!");
-        document.getElementById('nome').value = '';
-        document.getElementById('descricao').value = '';
-        document.getElementById('preco').value = '';
-        document.getElementById('imagem').value = '';
+        document.getElementById("nome").value = "";
+        document.getElementById("descricao").value = "";
+        document.getElementById("preco").value = "";
+        document.getElementById("imagem").value = "";
+        carregarTercos();
       } catch (err) {
         console.error(err);
         alert("Erro ao adicionar: " + err.message);
       }
+    }
+
+    // ---- CARREGAR LISTA ----
+    async function carregarTercos() {
+      const { data, error } = await client.from("tercos").select("*").order("id", { ascending: false });
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const tbody = document.querySelector("#tabela-tercos tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(t => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><img src="${t.imagem_url}" alt="${t.nome}"></td>
+          <td>${t.nome}</td>
+          <td>${t.descricao}</td>
+          <td>R$ ${Number(t.preco).toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
   </script>
 </body>
