@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rosário Borges</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#faf9f7; }
+    header { padding:20px; text-align:center; background:#f7f3f1; }
+    .botao-admin { display:inline-block; margin-top:8px; text-decoration:none; padding:8px 12px; background:#333; color:#fff; border-radius:6px; }
+    main.catalogo { padding:20px; max-width:1100px; margin:0 auto; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; }
+    .produto { background:#fff; border:1px solid #eee; padding:12px; border-radius:8px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+    .produto img { max-width:100%; height:180px; object-fit:cover; border-radius:6px; }
+    .produto h3 { margin:10px 0 6px; font-size:16px; }
+    .produto p { font-size:13px; color:#555; min-height:36px; }
+    .produto strong { display:block; margin-top:8px; font-size:15px; color:#111; }
+    .loader { text-align:center; padding:30px; color:#666; }
+    .erro { color:#a00; text-align:center; padding:16px; }
+    @media (max-width:420px) { .produto img { height:140px; } }
+  </style>
 </head>
 <body>
   <header>
@@ -12,10 +27,17 @@
     <p>Terços artesanais e religiosos</p>
     <a href="admin.html" class="botao-admin">Área do Vendedor</a>
   </header>
-  <main id="catalogo" class="catalogo"></main>
-  <footer>
+
+  <main id="catalogo" class="catalogo">
+    <div id="loader" class="loader">Carregando produtos...</div>
+    <div id="mensagem" class="erro" style="display:none;"></div>
+    <div id="produtosGrid" class="grid" style="display:none;"></div>
+  </main>
+
+  <footer style="text-align:center;padding:16px;color:#777;">
     <p>© 2025 Rosário Borges - Todos os direitos reservados</p>
   </footer>
+
   <script src="script.js"></script>
 </body>
 </html>
