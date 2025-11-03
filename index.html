@@ -3,24 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rosário Borges</title>
+  <title>Catálogo - Rosário Borges</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Biblioteca Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#faf9f7; }
-    header { padding:20px; text-align:center; background:#f7f3f1; }
-    .botao-admin { display:inline-block; margin-top:8px; text-decoration:none; padding:8px 12px; background:#333; color:#fff; border-radius:6px; }
-    main.catalogo { padding:20px; max-width:1100px; margin:0 auto; }
-    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; }
-    .produto { background:#fff; border:1px solid #eee; padding:12px; border-radius:8px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
-    .produto img { max-width:100%; height:180px; object-fit:cover; border-radius:6px; }
-    .produto h3 { margin:10px 0 6px; font-size:16px; }
-    .produto p { font-size:13px; color:#555; min-height:36px; }
-    .produto strong { display:block; margin-top:8px; font-size:15px; color:#111; }
-    .loader { text-align:center; padding:30px; color:#666; }
-    .erro { color:#a00; text-align:center; padding:16px; }
-    @media (max-width:420px) { .produto img { height:140px; } }
+    /* Pequeno estilo adicional caso o style.css não cubra */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f8f8f8;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #ddd;
+    }
+    header h1 {
+      margin: 0;
+      color: #333;
+    }
+    header p {
+      color: #777;
+      margin: 5px 0;
+    }
+    .catalogo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .produto {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    .produto:hover {
+      transform: scale(1.03);
+    }
+    .produto img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      color: #777;
+    }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Rosário Borges</h1>
@@ -29,17 +71,50 @@
   </header>
 
   <main id="catalogo" class="catalogo">
-    <div id="loader" class="loader">Carregando produtos...</div>
-    <div id="mensagem" class="erro" style="display:none;"></div>
-    <div id="produtosGrid" class="grid" style="display:none;"></div>
+    <p style="text-align:center; width:100%;" id="mensagem">Carregando produtos...</p>
   </main>
 
-  <footer style="text-align:center;padding:16px;color:#777;">
+  <footer>
     <p>© 2025 Rosário Borges - Todos os direitos reservados</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+  <script>
+    // Configuração Supabase - use as mesmas credenciais do admin
+    const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
+    const SUPABASE_KEY = "SUA_CHAVE_ANON_AQUI"; // mesma do admin
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  <script src="script.js"></script>
+    async function carregarProdutos() {
+      const mensagem = document.getElementById("mensagem");
+      mensagem.textContent = "Carregando produtos...";
+
+      const { data, error } = await supabase.from("tercos").select("*");
+
+      if (error) {
+        console.error("Erro ao carregar produtos:", error);
+        mensagem.textContent = "Erro ao carregar produtos.";
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        mensagem.textContent = "Nenhum produto cadastrado ainda.";
+        return;
+      }
+
+      mensagem.remove(); // remove texto de carregamento
+      const catalogo = document.getElementById("catalogo");
+
+      catalogo.innerHTML = data.map(p => `
+        <div class="produto">
+          <img src="${p.imagem_url || 'imagens/placeholder.png'}" alt="${p.nome}">
+          <h3>${p.nome}</h3>
+          <p>${p.descricao || ''}</p>
+          <strong>R$ ${Number(p.preco || 0).toFixed(2)}</strong>
+        </div>
+      `).join('');
+    }
+
+    carregarProdutos();
+  </script>
 </body>
 </html>
