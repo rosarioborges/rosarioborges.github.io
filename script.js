@@ -41,7 +41,7 @@ function handleError(err) {
 
 async function carregarProdutos() {
   try {
-    const res = await fetch(API_URL, { cache: "no-store" });
+    const res = await fetch('https://vovfzdppsrxxikqcipky.supabase.co', { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const produtos = await res.json();
     renderProdutos(produtos);
