@@ -1,7 +1,7 @@
 // script.js
 // Carrega produtos diretamente da API do banco de dados
 
-const API_URL = "https://seusite.com/api/produtos"; 
+const API_URL = "https://vovfzdppsrxxikqcipky.supabase.co"; 
 // ^^^ substitua pelo endpoint real do seu backend (ex: /api/produtos ou URL completa)
 
 const loaderEl = document.getElementById('loader');
@@ -41,7 +41,7 @@ function handleError(err) {
 
 async function carregarProdutos() {
   try {
-    const res = await fetch('https://vovfzdppsrxxikqcipky.supabase.co', { cache: "no-store" });
+    const res = await fetch(API_URL, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const produtos = await res.json();
     renderProdutos(produtos);
