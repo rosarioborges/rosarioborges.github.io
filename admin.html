@@ -146,18 +146,22 @@ async function carregarTercos() {
 
   const tbody = document.querySelector("#tabela-tercos tbody");
   tbody.innerHTML = "";
-
-  data.forEach(t => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><img src="${t.imagem_url}" alt="${t.nome}" width="80" height="80" style="object-fit:cover; border-radius:8px;"></td>
-      <td>${t.nome}</td>
-      <td>${t.descricao}</td>
-      <td>R$ ${Number(t.preco).toFixed(2)}</td>
-      <td><button onclick="removerTerco('${t.id}')" style="background-color:#c0392b; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Remover</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
+data.forEach(t => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><img src="${t.imagem_url}" alt="${t.nome}" width="80" height="80" style="object-fit:cover; border-radius:8px;"></td>
+    <td>${t.nome}</td>
+    <td>${t.descricao}</td>
+    <td>R$ ${Number(t.preco).toFixed(2)}</td>
+    <td>
+      <button onclick="removerTerco('${t.id}')" 
+        style="background-color:#c0392b; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
+        Remover
+      </button>
+    </td>
+  `;
+  tbody.appendChild(tr);
+});
 }
 
 // ---- REMOVER TERÇO ----
