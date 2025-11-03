@@ -82,13 +82,13 @@
     // Configuração Supabase - use as mesmas credenciais do admin
     const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTg1NTE0OCwiZXhwIjoyMDc3NDMxMTQ4fQ.4NVB4fyLYSj30n8kEN3N01GdnEZXY0LBBQ_4CIqy6C4"; // mesma do admin
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const cliente = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function carregarProdutos() {
       const mensagem = document.getElementById("mensagem");
       mensagem.textContent = "Carregando produtos...";
 
-      const { data, error } = await supabase.from("tercos").select("*");
+      const { data, error } = await cliente.from("tercos").select("*");
 
       if (error) {
         console.error("Erro ao carregar produtos:", error);
