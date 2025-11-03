@@ -1,8 +1,8 @@
-// script.js
-// Carrega produtos diretamente da API do banco de dados
+// script.js (supabase-js)
+const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTg1NTE0OCwiZXhwIjoyMDc3NDMxMTQ4fQ.4NVB4fyLYSj30n8kEN3N01GdnEZXY0LBBQ_4CIqy6C4";
 
-const API_URL = "https://vovfzdppsrxxikqcipky.supabase.co"; 
-// ^^^ substitua pelo endpoint real do seu backend (ex: /api/produtos ou URL completa)
+const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); // supabaseJs vem do CDN
 
 const loaderEl = document.getElementById('loader');
 const mensagemEl = document.getElementById('mensagem');
@@ -16,7 +16,7 @@ function renderProdutos(produtos) {
     return;
   }
 
-  const html = produtos.map(p => `
+  gridEl.innerHTML = produtos.map(p => `
     <div class="produto">
       <img src="${p.imagem || 'imagens/placeholder.png'}" alt="${p.nome || 'Sem nome'}">
       <h3>${p.nome || 'Produto sem nome'}</h3>
@@ -28,7 +28,6 @@ function renderProdutos(produtos) {
   loaderEl.style.display = 'none';
   mensagemEl.style.display = 'none';
   gridEl.style.display = 'grid';
-  gridEl.innerHTML = html;
 }
 
 function handleError(err) {
@@ -41,10 +40,9 @@ function handleError(err) {
 
 async function carregarProdutos() {
   try {
-    const res = await fetch(API_URL, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const produtos = await res.json();
-    renderProdutos(produtos);
+    const { data, error } = await supabase.from('produtos').select('*');
+    if (error) throw error;
+    renderProdutos(data);
   } catch (err) {
     handleError(err);
   }
