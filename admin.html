@@ -154,7 +154,7 @@ async function carregarTercos() {
       <td>${t.nome}</td>
       <td>${t.descricao}</td>
       <td>R$ ${Number(t.preco).toFixed(2)}</td>
-      <td><button onclick="removerTerco(${t.id})" style="background-color:#c0392b; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Remover</button></td>
+      <td><button onclick="removerTerco('${t.id}')" style="background-color:#c0392b; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Remover</button></td>
     `;
     tbody.appendChild(tr);
   });
