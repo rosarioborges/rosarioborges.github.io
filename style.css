@@ -1,27 +1,123 @@
+/* ======= style.css ======= */
+
+/* Paleta */
+:root {
+  --cor-principal: #800d0d;
+  --cor-secundaria: #af8787;
+  --cor-cinza: #a69e9d;
+  --cor-rosa: #efbec5;
+  --cor-branco: #ffffff;
+  --cor-preto: #000000;
+}
+
+/* ======= Estilo geral ======= */
 body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    #painel {
-      display: none;
-    }
-    input, button {
-      margin: 5px;
-      padding: 8px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    img {
-      width: 80px;
-      border-radius: 8px;
-    }
+  background-color: var(--cor-rosa);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+h1, h4 {
+  color: var(--cor-principal);
+  font-weight: 700;
+}
+
+/* ======= Botões ======= */
+.btn-primary {
+  background-color: var(--cor-principal);
+  border-color: var(--cor-principal);
+}
+.btn-primary:hover {
+  background-color: #a01212;
+  border-color: #a01212;
+}
+
+.btn-success {
+  background-color: var(--cor-secundaria);
+  border-color: var(--cor-secundaria);
+}
+.btn-success:hover {
+  background-color: #c39d9d;
+  border-color: #c39d9d;
+}
+
+.btn-danger {
+  background-color: var(--cor-principal);
+  border-color: var(--cor-principal);
+}
+.btn-danger:hover {
+  background-color: #a01212;
+  border-color: #a01212;
+}
+
+/* ======= Cards e tabelas ======= */
+.card {
+  border: none;
+  border-radius: 1rem;
+  background-color: var(--cor-branco);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.table thead {
+  background-color: var(--cor-principal);
+  color: white;
+}
+
+/* ======= Inputs ======= */
+.form-control:focus {
+  border-color: var(--cor-principal);
+  box-shadow: 0 0 0 0.25rem rgba(128, 13, 13, 0.25);
+}
+
+/* ======= Navbar e footer ======= */
+nav {
+  background-color: var(--cor-principal);
+}
+nav .navbar-brand {
+  color: var(--cor-branco);
+  font-weight: 600;
+}
+footer {
+  background-color: var(--cor-principal);
+  color: var(--cor-branco);
+  text-align: center;
+  padding: 20px;
+  margin-top: 50px;
+}
+footer small {
+  color: var(--cor-rosa);
+}
+
+/* ======= Sistema de Alertas ======= */
+.alert-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.site-toast {
+  background: var(--cor-principal);
+  color: white;
+  padding: 0.8rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+.site-toast.success { background: #28a745; }
+.site-toast.error { background: #dc3545; }
+.site-toast.warn { background: #ffc107; color: #000; }
+.site-toast .close {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
