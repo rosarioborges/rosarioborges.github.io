@@ -2,161 +2,156 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Painel do Vendedor - Rosário Borges</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    
-  </style>
-</head>
-<body>
-  <h1>Painel do Vendedor</h1>
 
-  <div id="login">
-    <h2>Login</h2>
-    <input type="password" id="senha" placeholder="Digite a senha" />
-    <button onclick="login()">Entrar</button>
-  </div>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <div id="painel">
-    <h2>Gerenciar Terços</h2>
-
-    <input type="text" id="nome" placeholder="Nome do terço" />
-    <input type="text" id="descricao" placeholder="Descrição" />
-    <input type="number" id="preco" placeholder="Preço" />
-    <input type="file" id="imagem" accept="image/*" />
-    <button onclick="adicionarTerco()">Adicionar</button>
-
-    <table id="tabela-tercos" border="1">
-  <thead>
-    <tr>
-      <th>Imagem</th>
-      <th>Nome</th>
-      <th>Descrição</th>
-      <th>Preço</th>
-      <th>Ações</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-  </div>
-
-  <!-- Carregar o SDK DO SUPABASE ANTES DO SEU SCRIPT -->
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-light">
+
+  <div class="container py-5">
+    <h1 class="text-center mb-4">Painel do Vendedor</h1>
+
+    <!-- Login -->
+    <div id="login" class="card mx-auto shadow-sm" style="max-width: 400px;">
+      <div class="card-body">
+        <h4 class="card-title mb-3 text-center">Login</h4>
+        <input type="password" id="senha" class="form-control mb-3" placeholder="Digite a senha">
+        <button class="btn btn-primary w-100" onclick="login()">Entrar</button>
+      </div>
+    </div>
+
+    <!-- Painel -->
+    <div id="painel" style="display:none;">
+      <div class="card shadow-sm mt-5">
+        <div class="card-body">
+          <h4 class="card-title mb-3">Gerenciar Terços</h4>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-3">
+              <input type="text" id="nome" class="form-control" placeholder="Nome do terço">
+            </div>
+            <div class="col-md-3">
+              <input type="text" id="descricao" class="form-control" placeholder="Descrição">
+            </div>
+            <div class="col-md-2">
+              <input type="number" id="preco" class="form-control" placeholder="Preço">
+            </div>
+            <div class="col-md-3">
+              <input type="file" id="imagem" class="form-control" accept="image/*">
+            </div>
+            <div class="col-md-1 d-grid">
+              <button class="btn btn-success" onclick="adicionarTerco()">+</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table id="tabela-tercos" class="table table-striped align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Imagem</th>
+                  <th>Nome</th>
+                  <th>Descrição</th>
+                  <th>Preço</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
     const SENHA = "admin123";
 
-function login() {
-  const senha = document.getElementById("senha").value;
-  if (senha === SENHA) {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("painel").style.display = "block";
-    carregarTercos();
-  } else {
-    alert("Senha incorreta!");
-  }
-}
+    function login() {
+      const senha = document.getElementById("senha").value;
+      if (senha === SENHA) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("painel").style.display = "block";
+        carregarTercos();
+      } else {
+        alert("Senha incorreta!");
+      }
+    }
 
-// ✅ Instanciar o cliente Supabase CORRETAMENTE
-const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTg1NTE0OCwiZXhwIjoyMDc3NDMxMTQ4fQ.4NVB4fyLYSj30n8kEN3N01GdnEZXY0LBBQ_4CIqy6C4";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTg1NTE0OCwiZXhwIjoyMDc3NDMxMTQ4fQ.4NVB4fyLYSj30n8kEN3N01GdnEZXY0LBBQ_4CIqy6C4";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ---- ADICIONAR TERÇO ----
-async function adicionarTerco() {
-  const nome = document.getElementById("nome").value.trim();
-  const descricao = document.getElementById("descricao").value.trim();
-  const preco = document.getElementById("preco").value.trim();
-  const imagem = document.getElementById("imagem").files[0];
+    async function adicionarTerco() {
+      const nome = document.getElementById("nome").value.trim();
+      const descricao = document.getElementById("descricao").value.trim();
+      const preco = document.getElementById("preco").value.trim();
+      const imagem = document.getElementById("imagem").files[0];
 
-  if (!nome || !descricao || !preco || !imagem) {
-    alert("Preencha todos os campos e selecione uma imagem!");
-    return;
-  }
+      if (!nome || !descricao || !preco || !imagem) {
+        alert("Preencha todos os campos e selecione uma imagem!");
+        return;
+      }
 
-  try {
-    const nomeArquivo = `${Date.now()}_${imagem.name}`;
+      try {
+        const nomeArquivo = `${Date.now()}_${imagem.name}`;
+        const { error: uploadError } = await supabase.storage.from("imagem_tercos").upload(nomeArquivo, imagem);
+        if (uploadError) throw uploadError;
 
-    // 1️⃣ Upload da imagem
-    const { error: uploadError } = await supabase.storage
-      .from("imagem_tercos")
-      .upload(nomeArquivo, imagem);
+        const { data } = supabase.storage.from("imagem_tercos").getPublicUrl(nomeArquivo);
+        const imagemUrl = data.publicUrl;
 
-    if (uploadError) throw uploadError;
+        const { error: insertError } = await supabase
+          .from("tercos")
+          .insert([{ nome, descricao, preco, imagem_url: imagemUrl }]);
 
-    // 2️⃣ URL pública
-    const { data } = supabase.storage.from("imagem_tercos").getPublicUrl(nomeArquivo);
-    const imagemUrl = data.publicUrl;
+        if (insertError) throw insertError;
 
-    // 3️⃣ Inserir no banco
-    const { error: insertError } = await supabase
-      .from("tercos")
-      .insert([{ nome, descricao, preco, imagem_url: imagemUrl }]);
+        alert("✅ Terço adicionado com sucesso!");
+        document.getElementById("nome").value = "";
+        document.getElementById("descricao").value = "";
+        document.getElementById("preco").value = "";
+        document.getElementById("imagem").value = "";
+        carregarTercos();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao adicionar: " + err.message);
+      }
+    }
 
-    if (insertError) throw insertError;
+    async function carregarTercos() {
+      const { data, error } = await supabase.from("tercos").select("*").order("id", { ascending: false });
+      if (error) return console.error(error);
 
-    alert("✅ Terço adicionado com sucesso!");
-    document.getElementById("nome").value = "";
-    document.getElementById("descricao").value = "";
-    document.getElementById("preco").value = "";
-    document.getElementById("imagem").value = "";
-    carregarTercos();
-  } catch (err) {
-    console.error(err);
-    alert("Erro ao adicionar: " + err.message);
-  }
-}
+      const tbody = document.querySelector("#tabela-tercos tbody");
+      tbody.innerHTML = "";
+      data.forEach(t => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><img src="${t.imagem_url}" width="60" height="60" class="rounded"></td>
+          <td>${t.nome}</td>
+          <td>${t.descricao}</td>
+          <td>R$ ${Number(t.preco).toFixed(2)}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="removerTerco('${t.id}')">Remover</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-// ---- CARREGAR LISTA ----
-async function carregarTercos() {
-  const { data, error } = await supabase
-    .from("tercos")
-    .select("*")
-    .order("id", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  const tbody = document.querySelector("#tabela-tercos tbody");
-  tbody.innerHTML = "";
-data.forEach(t => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td><img src="${t.imagem_url}" alt="${t.nome}" width="80" height="80" style="object-fit:cover; border-radius:8px;"></td>
-    <td>${t.nome}</td>
-    <td>${t.descricao}</td>
-    <td>R$ ${Number(t.preco).toFixed(2)}</td>
-    <td>
-      <button onclick="removerTerco('${t.id}')" 
-        style="background-color:#c0392b; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
-        Remover
-      </button>
-    </td>
-  `;
-  tbody.appendChild(tr);
-});
-}
-
-// ---- REMOVER TERÇO ----
-async function removerTerco(id) {
-  if (!confirm("Tem certeza que deseja remover este terço?")) return;
-
-  try {
-    const { error } = await supabase.from("tercos").delete().eq("id", id);
-
-    if (error) throw error;
-
-    alert("🗑️ Terço removido com sucesso!");
-    carregarTercos();
-  } catch (err) {
-    console.error(err);
-    alert("Erro ao remover: " + err.message);
-  }
-}
-
-
+    async function removerTerco(id) {
+      if (!confirm("Tem certeza que deseja remover este terço?")) return;
+      const { error } = await supabase.from("tercos").delete().eq("id", id);
+      if (error) return alert("Erro ao remover: " + error.message);
+      alert("🗑️ Terço removido com sucesso!");
+      carregarTercos();
+    }
   </script>
 </body>
 </html>
