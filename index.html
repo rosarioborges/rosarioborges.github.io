@@ -2,96 +2,43 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Catálogo - Rosário Borges</title>
-  <link rel="stylesheet" href="style.css">
 
-  <!-- Biblioteca Supabase -->
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    /* Pequeno estilo adicional caso o style.css não cubra */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f8f8f8;
-    }
-    header {
-      text-align: center;
-      padding: 20px;
-      background-color: #ffffff;
-      border-bottom: 1px solid #ddd;
-    }
-    header h1 {
-      margin: 0;
-      color: #333;
-    }
-    header p {
-      color: #777;
-      margin: 5px 0;
-    }
-    .catalogo {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-    .produto {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 15px;
-      text-align: center;
-      transition: transform 0.2s ease;
-    }
-    .produto:hover {
-      transform: scale(1.03);
-    }
-    .produto img {
-      max-width: 100%;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    footer {
-      text-align: center;
-      padding: 15px;
-      background: #fff;
-      border-top: 1px solid #ddd;
-      color: #777;
-    }
-  </style>
 </head>
+<body class="bg-light">
 
-<body>
-  <header>
-    <h1>Rosário Borges</h1>
-    <p>Terços artesanais e religiosos</p>
-    <a href="admin.html" class="botao-admin">Área do Vendedor</a>
+  <header class="bg-white border-bottom py-4 text-center">
+    <h1 class="fw-bold">Rosário Borges</h1>
+    <p class="text-muted mb-2">Terços artesanais e religiosos</p>
+    <a href="admin.html" class="btn btn-outline-primary btn-sm">Área do Vendedor</a>
   </header>
 
-  <main id="catalogo" class="catalogo">
-    <p style="text-align:center; width:100%;" id="mensagem">Carregando produtos...</p>
+  <main class="container py-5">
+    <div id="mensagem" class="text-center text-muted mb-4">Carregando produtos...</div>
+    <div id="catalogo" class="row g-4"></div>
   </main>
 
-  <footer>
-    <p>© 2025 Rosário Borges - Todos os direitos reservados</p>
+  <footer class="bg-white border-top py-3 text-center text-muted">
+    © 2025 Rosário Borges - Todos os direitos reservados
   </footer>
 
   <script>
-    // Configuração Supabase - use as mesmas credenciais do admin
     const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTg1NTE0OCwiZXhwIjoyMDc3NDMxMTQ4fQ.4NVB4fyLYSj30n8kEN3N01GdnEZXY0LBBQ_4CIqy6C4"; // mesma do admin
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTg1NTE0OCwiZXhwIjoyMDc3NDMxMTQ4fQ.4NVB4fyLYSj30n8kEN3N01GdnEZXY0LBBQ_4CIqy6C4";
     const cliente = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function carregarProdutos() {
       const mensagem = document.getElementById("mensagem");
-      mensagem.textContent = "Carregando produtos...";
+      const catalogo = document.getElementById("catalogo");
 
-      const { data, error } = await cliente.from("tercos").select("*");
-
+      const { data, error } = await cliente.from("tercos").select("*").order("id", { ascending: false });
       if (error) {
-        console.error("Erro ao carregar produtos:", error);
         mensagem.textContent = "Erro ao carregar produtos.";
         return;
       }
@@ -101,20 +48,24 @@
         return;
       }
 
-      mensagem.remove(); // remove texto de carregamento
-      const catalogo = document.getElementById("catalogo");
-
+      mensagem.remove();
       catalogo.innerHTML = data.map(p => `
-        <div class="produto">
-          <img src="${p.imagem_url || 'imagens/placeholder.png'}" alt="${p.nome}">
-          <h3>${p.nome}</h3>
-          <p>${p.descricao || ''}</p>
-          <strong>R$ ${Number(p.preco || 0).toFixed(2)}</strong>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div class="card h-100 shadow-sm border-0">
+            <img src="${p.imagem_url || 'imagens/placeholder.png'}" class="card-img-top" alt="${p.nome}">
+            <div class="card-body text-center">
+              <h5 class="card-title">${p.nome}</h5>
+              <p class="card-text text-muted small">${p.descricao || ''}</p>
+              <div class="fw-bold text-primary">R$ ${Number(p.preco || 0).toFixed(2)}</div>
+            </div>
+          </div>
         </div>
       `).join('');
     }
 
     carregarProdutos();
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
