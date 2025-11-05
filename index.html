@@ -1,71 +1,160 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Catálogo - Rosário Borges</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rosário Borges - Catálogo de Terços</title>
 
   <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  >
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-light">
 
-  <header class="bg-white border-bottom py-4 text-center">
-    <h1 class="fw-bold">Rosário Borges</h1>
-    <p class="text-muted mb-2">Terços artesanais e religiosos</p>
-    <a href="admin.html" class="btn btn-outline-primary btn-sm">Área do Vendedor</a>
-  </header>
-
-  <main class="container py-5">
-    <div id="mensagem" class="text-center text-muted mb-4">Carregando produtos...</div>
-    <div id="catalogo" class="row g-4"></div>
-  </main>
-
-  <footer class="bg-white border-top py-3 text-center text-muted">
-    © 2025 Rosário Borges - Todos os direitos reservados
-  </footer>
-
-  <script>
-    const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTg1NTE0OCwiZXhwIjoyMDc3NDMxMTQ4fQ.4NVB4fyLYSj30n8kEN3N01GdnEZXY0LBBQ_4CIqy6C4";
-    const cliente = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    async function carregarProdutos() {
-      const mensagem = document.getElementById("mensagem");
-      const catalogo = document.getElementById("catalogo");
-
-      const { data, error } = await cliente.from("tercos").select("*").order("id", { ascending: false });
-      if (error) {
-        mensagem.textContent = "Erro ao carregar produtos.";
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        mensagem.textContent = "Nenhum produto cadastrado ainda.";
-        return;
-      }
-
-      mensagem.remove();
-      catalogo.innerHTML = data.map(p => `
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-          <div class="card h-100 shadow-sm border-0">
-            <img src="${p.imagem_url || 'imagens/placeholder.png'}" class="card-img-top" alt="${p.nome}">
-            <div class="card-body text-center">
-              <h5 class="card-title">${p.nome}</h5>
-              <p class="card-text text-muted small">${p.descricao || ''}</p>
-              <div class="fw-bold text-primary">R$ ${Number(p.preco || 0).toFixed(2)}</div>
-            </div>
-          </div>
-        </div>
-      `).join('');
+  <style>
+    :root {
+      --cor-principal: #800d0d;
+      --cor-secundaria: #af8787;
+      --cor-cinza: #a69e9d;
+      --cor-rosa: #efbec5;
+      --cor-branco: #ffffff;
+      --cor-preto: #000000;
     }
 
-    carregarProdutos();
+    body {
+      background-color: var(--cor-rosa);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    nav {
+      background-color: var(--cor-principal);
+    }
+
+    nav .navbar-brand {
+      color: var(--cor-branco);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    nav .navbar-brand:hover {
+      color: var(--cor-branco);
+    }
+
+    h1 {
+      color: var(--cor-principal);
+      font-weight: 700;
+    }
+
+    .card {
+      border: none;
+      border-radius: 1rem;
+      background-color: var(--cor-branco);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-primary {
+      background-color: var(--cor-principal);
+      border-color: var(--cor-principal);
+    }
+
+    .btn-primary:hover {
+      background-color: #a01212;
+      border-color: #a01212;
+    }
+
+    footer {
+      background-color: var(--cor-principal);
+      color: var(--cor-branco);
+      text-align: center;
+      padding: 20px;
+      margin-top: 50px;
+    }
+
+    footer small {
+      color: var(--cor-rosa);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark py-3">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-heart-fill me-2"></i>Rosário Borges
+      </a>
+    </div>
+  </nav>
+
+  <!-- Conteúdo -->
+  <div class="container py-5">
+    <h1 class="text-center mb-5">Catálogo de Terços</h1>
+
+    <div id="lista-tercos" class="row g-4">
+      <!-- Cards de produtos vão ser carregados aqui -->
+    </div>
+  </div>
+
+  <footer>
+    <div>© 2025 Rosário Borges</div>
+    <small>Todos os direitos reservados</small>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous">
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Script Supabase -->
+  <script>
+    const SUPABASE_URL = "https://vovfzdppsrxxikqcipky.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvdmZ6ZHBwc3J4eGlrcWNpcGt5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTg1NTE0OCwiZXhwIjoyMDc3NDMxMTQ4fQ.4NVB4fyLYSj30n8kEN3N01GdnEZXY0LBBQ_4CIqy6C4";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function carregarTercos() {
+      const { data, error } = await supabase.from("tercos").select("*").order("id", { ascending: false });
+      if (error) return console.error("Erro ao carregar terços:", error);
+
+      const container = document.getElementById("lista-tercos");
+      container.innerHTML = "";
+
+      data.forEach(t => {
+        const col = document.createElement("div");
+        col.className = "col-12 col-sm-6 col-md-4 col-lg-3";
+        col.innerHTML = `
+          <div class="card h-100 text-center">
+            <img src="${t.imagem_url}" class="card-img-top" alt="${t.nome}">
+            <div class="card-body">
+              <h5 class="card-title">${t.nome}</h5>
+              <p class="card-text text-muted">${t.descricao}</p>
+              <p class="fw-bold fs-5" style="color: var(--cor-principal)">R$ ${Number(t.preco).toFixed(2)}</p>
+              <button class="btn btn-primary w-100">
+                <i class="bi bi-whatsapp me-2"></i>Comprar
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(col);
+      });
+    }
+
+    carregarTercos();
+  </script>
 </body>
 </html>
